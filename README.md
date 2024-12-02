@@ -102,3 +102,29 @@ UPDATE src/styles.scss (182 bytes)
 > - `angular.json`: acréscimo do estilo CSS referente ao tema escolhido (aqui no caso foi `azure-blue.css`);
 > - `index.html`: acréscimo dos estilos CSS das fontes (_note que esses CSS não ficam salvos localmente no projeto_);
 > - `styles.scss`: mudanças do estilo CSS global.
+
+# Aula 03 - Criando uma Toolbar na Página Principal
+Vamos importar o módulo `MatToolbarModule` antes de usá-lo no HTML:
+```TypeScript
+// crud-angular\src\app\app.module.ts
+
+import { MatToolbarModule } from '@angular/material/toolbar';
+// Resto do código
+@NgModule({
+  // Resto do código
+  imports: [
+    // Resto do código
+    BrowserAnimationsModule,
+    MatToolbarModule,
+  ],
+  // Resto do código
+})
+export class AppModule { }
+```
+
+O uso no HTML de `AppComponent`:
+```HTML
+<mat-toolbar color="primary">
+  <span>CRUD Angular + Spring</span>
+</mat-toolbar>
+```
