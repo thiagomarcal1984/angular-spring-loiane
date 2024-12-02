@@ -128,3 +128,111 @@ O uso no HTML de `AppComponent`:
   <span>CRUD Angular + Spring</span>
 </mat-toolbar>
 ```
+
+# Aula 04 - Criando o Módulo de Cursos e Usando Roteamento com Lazy Loading
+Vamos usar a Angular CLI para criar um módulo chamado `CoursesModule`:
+```bash
+ng g m courses --routing
+# Output
+CREATE src/app/courses/courses-routing.module.ts (250 bytes)
+CREATE src/app/courses/courses.module.ts (284 bytes)
+```
+> Note que criamos o módulo com roteamento ao usarmos o parâmetro `--routing`.
+
+Módulos ajudam a organizar os componentes.
+
+Conteúdo do `CoursesModule`:
+```TypeScript
+// crud-angular\src\app\courses\courses.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { CoursesRoutingModule } from './courses-routing.module';
+import { CoursesComponent } from './courses/courses.component';
+
+
+@NgModule({
+  declarations: [
+    CoursesComponent
+  ],
+  imports: [
+    CommonModule,
+    CoursesRoutingModule
+  ]
+})
+export class CoursesModule { }
+```
+
+Conteúdo do `CoursesRoutingModule`:
+```TypeScript
+// crud-angular\src\app\courses\courses-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { CoursesComponent } from './courses/courses.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    component: CoursesComponent,
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class CoursesRoutingModule { }
+```
+
+Agora, vamos criar o `CoursesComponent` dentro de `CoursesModule`:
+```bash
+ng g c courses/courses --skip-tests
+# Output
+CREATE src/app/courses/courses/courses.component.html (22 bytes)
+CREATE src/app/courses/courses/courses.component.ts (207 bytes)
+CREATE src/app/courses/courses/courses.component.scss (0 bytes)
+UPDATE src/app/courses/courses.module.ts (372 bytes)
+```
+
+O módulo `CoursesModule` e as rotas de `CourseRoutingModule` são carregados via lazy loading: eles só serão carregados quando a rota correspondente em `AppRoutingModule` for solicitada.
+
+```TypeScript
+// crud-angular\src\app\app-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'courses',
+  },
+  {
+    path: 'courses',
+    loadChildren: () => import('./courses/courses.module')
+      .then(m => m.CoursesModule)
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+> Note que a rota `courses` tem o parâmetro `loadChildren`: esse parâmetro recebe uma `Promise` retornada pelo método `import`. Concluído o carregamento do arquivo de `CoursesModule`, ele é executado em seguida.
+
+Para renderizar o conteúdo roteado (o `CoursesComponent` presente em `CoursesRoutingModule`), é necessário usar a tag `<router-outlet>` em `AppComponent`:
+```HTML
+<!-- crud-angular\src\app\app.component.html -->
+
+<mat-toolbar color="primary">
+  <span>CRUD Angular + Spring</span>
+</mat-toolbar>
+<router-outlet></router-outlet>
+```
